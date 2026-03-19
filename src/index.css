@@ -112,3 +112,13 @@ textarea:focus {
 		background-color: #f9f9f9;
 	}
 }
+input {
+  
+  background-color: white;
+  border: 1px solid #555;
+  padding: 8px;
+}
+
+input::placeholder {
+  color: #aaa;
+}

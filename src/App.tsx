@@ -1,5 +1,6 @@
 import dpsLogo from './assets/DPS.svg';
 import './App.css';
+import AddressForm from "./components/AddressForm";
 
 function App() {
 	return (
@@ -9,8 +10,10 @@ function App() {
 					<img src={dpsLogo} className="logo" alt="DPS logo" />
 				</a>
 			</div>
+
+
 			<div className="home-card">
-				<p>Your solution goes here 😊</p>
+				 <AddressForm />
 			</div>
 		</>
 	);
