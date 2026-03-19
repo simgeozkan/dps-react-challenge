@@ -48,6 +48,13 @@ function AddressForm() {
   useEffect(() => {
     if (!debouncedPostalCode || activeField !== "postal") return;
 
+    if (debouncedPostalCode.length !== 5) {
+    setFieldState("idle");
+    setLocality("");
+    setError("");
+    return;
+  }
+
     setLoading(true);
     setFieldState("loading");
     setError("");
