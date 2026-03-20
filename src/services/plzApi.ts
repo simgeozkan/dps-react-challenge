@@ -12,7 +12,8 @@ export const fetchByPostalCode = async (plz: string) => {
 
 
 export const fetchByLocality = async (locality: string) => {
-  const res = await fetch(`${BASE_URL}/Localities?locality=${locality}`);
+  const res = await fetch(`${BASE_URL}/Localities?name=${encodeURIComponent(locality)}`);
   if (!res.ok) throw new Error("Locality not found");
   return res.json();
 };
+

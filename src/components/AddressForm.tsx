@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useDebounce } from "../hooks/useDebounce";
+import { fetchByPostalCode, fetchByLocality } from "../services/plzApi";
 
 interface LocalityData {
   postalCode: string;
@@ -45,6 +46,9 @@ function AddressForm() {
 
 
   // PLZ → Locality
+
+
+
   useEffect(() => {
     if (!debouncedPostalCode || activeField !== "postal") return;
 
@@ -61,9 +65,11 @@ function AddressForm() {
     setPostalSuccess(false);
     setLocalitySuccess(false);
 
-    fetch(`https://openplzapi.org/de/Localities?postalCode=${debouncedPostalCode}`)
-      .then((res) => res.json())
-      .then((data: LocalityData[]) => {
+    fetchByPostalCode(debouncedPostalCode)
+  .then((data: LocalityData[]) => {
+
+
+
         if (!data || data.length === 0) {
           setError("Invalid postal code");
           setFieldState("error");
@@ -105,9 +111,8 @@ function AddressForm() {
     setPostalSuccess(false);
     setLocalitySuccess(false);
 
-    fetch(`https://openplzapi.org/de/Localities?name=${encodeURIComponent(debouncedLocality)}`)
-      .then((res) => res.json())
-      .then((data: LocalityData[]) => {
+    fetchByLocality(debouncedLocality)
+  .then((data: LocalityData[]) => {
         if (!data || data.length === 0) {
           setError("Locality not found");
           setFieldState("error");
