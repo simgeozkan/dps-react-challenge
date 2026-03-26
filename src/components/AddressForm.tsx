@@ -16,11 +16,11 @@ function AddressForm() {
 
 	const [error, setError] = useState('');
 	const [loading, setLoading] = useState(false);
+
 	const [activeField, setActiveField] = useState<
 		'postal' | 'locality' | null
 	>(null);
 	const [fieldState, setFieldState] = useState<FieldState>('idle');
-
 	const [focusedPostalIndex, setFocusedPostalIndex] = useState(-1); //focused index for PLZ dropdown
 
 	const [plzOptions, setPlzOptions] = useState<string[]>([]); // convert to dropdown
@@ -28,7 +28,7 @@ function AddressForm() {
 	const [postalSuccess, setPostalSuccess] = useState(false);
 	const [localitySuccess, setLocalitySuccess] = useState(false);
 
-	const debouncedPostalCode = useDebounce(postalCode, 1000);
+	const debouncedPostalCode = useDebounce(postalCode, 1000); // for useEffect- timer hook
 	const debouncedLocality = useDebounce(locality, 1000);
 	const MAX_DROPDOWN = 15;
 
@@ -55,14 +55,12 @@ function AddressForm() {
 					setError('Invalid postal code');
 					setFieldState('error');
 					setLocality('');
-
 					setPlzOptions([]);
 					setPostalSuccess(false);
 					setLocalitySuccess(false);
 					return;
 				}
 				setLocality(data[0].name);
-
 				setPlzOptions([]);
 				setLocalityData([]);
 				setFieldState('success');
@@ -170,17 +168,19 @@ function AddressForm() {
 
 	// PLZ input key navigation
 	const handlePostalKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+		if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter') {
+			e.preventDefault(); // ← onChange'e geçmesin
+		}
+
 		if (plzOptions.length === 0) return;
+
 		if (e.key === 'ArrowDown') {
-			e.preventDefault();
 			setFocusedPostalIndex((i) =>
 				Math.min(i + 1, plzOptions.length - 1),
 			);
 		} else if (e.key === 'ArrowUp') {
-			e.preventDefault();
 			setFocusedPostalIndex((i) => Math.max(i - 1, 0));
 		} else if (e.key === 'Enter' && focusedPostalIndex >= 0) {
-			e.preventDefault();
 			handleSelectPlzOption(plzOptions[focusedPostalIndex]);
 		}
 	};
@@ -216,16 +216,18 @@ function AddressForm() {
 		>
 			<h2 style={{ color: 'white' }}>German Address Validator</h2>
 
-			{/* Locality Input + Dropdown */}
+			{/* Locality Input */}
 			<label
 				htmlFor="locality"
 				style={{ color: '#aaa', fontSize: '12px' }}
 			>
 				Locality
 			</label>
+
 			<div style={{ position: 'relative', marginBottom: '16px' }}>
 				<input
 					id="locality"
+					onKeyDown={handlePostalKeyDown}
 					placeholder="Berlin"
 					value={locality}
 					aria-label="Locality"
@@ -234,15 +236,14 @@ function AddressForm() {
 					onChange={(e) => {
 						setActiveField('locality');
 						setLocality(e.target.value);
-
 						setPlzOptions([]);
 						setFieldState('idle');
 						setError('');
 						setPostalSuccess(false);
 						setLocalitySuccess(false);
+
 						if (!e.target.value) {
 							setPostalCode('');
-
 							setPlzOptions([]);
 							setLocalityData([]);
 							setFieldState('idle');
@@ -280,6 +281,7 @@ function AddressForm() {
 			</div>
 
 			{/* PLZ Input */}
+
 			<label
 				htmlFor="postalCode"
 				style={{ color: '#aaa', fontSize: '12px' }}
@@ -315,7 +317,7 @@ function AddressForm() {
 					aria-expanded={plzOptions.length > 0}
 					aria-autocomplete="list"
 					aria-controls="plz-options"
-					onKeyDown={handlePostalKeyDown}
+					// onKeyDown={handlePostalKeyDown}
 					onChange={(e) => {
 						const val = e.target.value.replace(/\D/g, '');
 						setActiveField('postal');
@@ -324,7 +326,7 @@ function AddressForm() {
 						setError('');
 						setPostalSuccess(false);
 						setLocalitySuccess(false);
-						setPlzOptions([]); // kullanıcı yazmaya başlarsa PLZ dropdown kapanır
+						setPlzOptions([]); // close PLZ dropdown if user key down
 						if (!val) {
 							setLocality('');
 
@@ -392,6 +394,7 @@ function AddressForm() {
 						✕
 					</span>
 				)}
+
 				{loading && activeField === 'postal' && (
 					<span
 						style={{
@@ -474,8 +477,7 @@ function AddressForm() {
 									fontStyle: 'italic',
 								}}
 							>
-								{totalPlzResults - MAX_DROPDOWN} more results —
-								type more to narrow down
+								{totalPlzResults - MAX_DROPDOWN}
 							</li>
 						)}
 					</ul>
